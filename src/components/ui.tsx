@@ -13,9 +13,17 @@ export function Tex({ children, block = false }: { children: string; block?: boo
     if (!el) return
     const check = () => setScrolls(el.scrollWidth > el.clientWidth + 1)
     check()
+    // KaTeX 글꼴이 늦게 로드되면 내용만 넓어지고 상자 크기는 그대로라, 내용 요소도 함께 관찰한다
     const ro = new ResizeObserver(check)
     ro.observe(el)
-    return () => ro.disconnect()
+    const inner = el.querySelector('.katex-display, .katex')
+    if (inner) ro.observe(inner)
+    let alive = true
+    document.fonts?.ready.then(() => alive && check())
+    return () => {
+      alive = false
+      ro.disconnect()
+    }
   }, [html])
   if (!block) return <span dangerouslySetInnerHTML={{ __html: html }} />
   return <div ref={ref} className="tex-block" dangerouslySetInnerHTML={{ __html: html }} {...(scrolls ? { tabIndex: 0, role: 'region', 'aria-label': '수식 (가로로 스크롤)' } : {})} />

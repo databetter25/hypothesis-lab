@@ -11,6 +11,7 @@
 npm install
 npm run dev      # http://localhost:5173
 npm test         # 엔진 기준값·불변식·시뮬레이션 테스트 (vitest)
+npm run e2e      # 배포 빌드로 E2E·접근성(axe)·오프라인 테스트 (Playwright, 최초 1회 npx playwright install chromium)
 npm run build    # dist/ 정적 산출물 (상대 경로라 어느 하위 경로에도 배포 가능)
 ```
 
@@ -35,6 +36,9 @@ npm run build    # dist/ 정적 산출물 (상대 경로라 어느 하위 경로
 - 배포 빌드에는 서비스 워커(`sw.js`, `vite.config.ts`의 `offlineServiceWorker`)가 들어가 산출물 전체를 미리 캐시한다. 한 번 열면 인터넷 없이도 모든 페이지와 시뮬레이션이 동작한다. 확인은 `npm run preview`.
 - 시뮬레이션 패널의 `⬇ CSV`는 현재 설정(URL), 시드·난수 버전, 기각 비율과 Wilson 구간, 원자료를 저장한다 (`src/lib/exportCsv.ts`).
 
-## 접근성 점검
+## 테스트와 배포
 
-`npm run dev`로 연 브라우저 콘솔에 `tools/a11y-audit.js`를 붙여 넣으면 모든 페이지·모형을 axe-core(WCAG 2.2 AA)로 점검한다. 2026-10-12 기준 데스크톱 43쪽, 모바일(375px) 16쪽 모두 위반 0건.
+- `e2e/a11y.spec.ts`: 모든 페이지·모형(데스크톱 43쪽, 모바일 13쪽)에서 axe-core WCAG 2.2 AA 위반 0건, 콘솔 오류 0건, 모바일 가로 넘침 없음.
+- `e2e/flows.spec.ts`: 기준값 표시, α와 p-값의 독립(A04), 같은 시드 링크의 재현(A08), 잘못된 링크 복원(A09), 키보드 조작(A10), 안내 학습 저장, 용어사전, CSV(F19), 오프라인(F20).
+- `main`에 푸시하면 GitHub Actions가 단위 테스트 → E2E → 빌드를 거쳐 통과할 때만 Pages에 배포한다.
+- 개발 서버에서 빠르게 점검하려면 브라우저 콘솔에 `tools/a11y-audit.js`를 붙여 넣는다.

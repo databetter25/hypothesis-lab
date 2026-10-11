@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react'
 import { createHash } from 'node:crypto'
 import { defineConfig, type Plugin } from 'vite'
@@ -62,4 +63,6 @@ self.addEventListener('fetch', (e) => {
 export default defineConfig({
   base: './',
   plugins: [react(), offlineServiceWorker()],
+  // Vitest는 단위 테스트만, Playwright(e2e/)는 따로 돌린다
+  test: { exclude: ['e2e/**', 'node_modules/**', 'dist/**'] },
 })

@@ -26,3 +26,7 @@ dist-ssr
 # 저작권 자료는 저장소에 넣지 않는다
 *.pdf
 .claude/
+
+# Playwright
+test-results/
+playwright-report/
